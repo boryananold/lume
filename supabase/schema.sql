@@ -230,6 +230,44 @@ create policy "Users can delete own posts"
   using (auth.uid() = user_id);
 
 -- ─────────────────────────────────────────
+-- POST LIKES
+-- ─────────────────────────────────────────
+create table if not exists post_likes (
+  post_id  uuid not null references posts(id) on delete cascade,
+  user_id  uuid not null references profiles(id) on delete cascade,
+  primary key (post_id, user_id)
+);
+
+alter table post_likes enable row level security;
+
+create policy "Users can see all likes"
+  on post_likes for select using (true);
+
+create policy "Users can like posts"
+  on post_likes for insert
+  with check (auth.uid() = user_id);
+
+create policy "Users can unlike their own likes"
+  on post_likes for delete
+  using (auth.uid() = user_id);
+
+create or replace function update_post_likes_count()
+returns trigger language plpgsql as $$
+begin
+  if tg_op = 'INSERT' then
+    update posts set likes_count = likes_count + 1 where id = new.post_id;
+  elsif tg_op = 'DELETE' then
+    update posts set likes_count = greatest(likes_count - 1, 0) where id = old.post_id;
+  end if;
+  return null;
+end;
+$$;
+
+create trigger post_likes_count_trigger
+after insert or delete on post_likes
+for each row execute function update_post_likes_count();
+
+-- ─────────────────────────────────────────
 -- BOOKINGS (Expert sessions — Glow Elite)
 -- ─────────────────────────────────────────
 create table if not exists bookings (

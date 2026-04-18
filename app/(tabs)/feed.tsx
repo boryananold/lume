@@ -17,7 +17,19 @@ function timeAgo(isoDate: string): string {
   return `${Math.floor(hours / 24)}d ago`;
 }
 
-function PostCard({ post, currentUserId, onDelete }: { post: Post; currentUserId: string; onDelete: (id: string) => void }) {
+function PostCard({
+  post,
+  currentUserId,
+  isLiked,
+  onLike,
+  onDelete,
+}: {
+  post: Post;
+  currentUserId: string;
+  isLiked: boolean;
+  onLike: (id: string) => void;
+  onDelete: (id: string) => void;
+}) {
   const [confirming, setConfirming] = useState(false);
   const isOwn = post.user_id === currentUserId;
   const displayName = post.author_email?.split('@')[0] ?? 'lumé member';
@@ -54,7 +66,14 @@ function PostCard({ post, currentUserId, onDelete }: { post: Post; currentUserId
         <Image source={{ uri: post.photo_url }} style={styles.postImage} resizeMode="cover" />
       )}
       <View style={styles.postFooter}>
-        <Text style={styles.likes}>♡  {post.likes_count}</Text>
+        <TouchableOpacity onPress={() => onLike(post.id)} style={styles.likeBtn} activeOpacity={0.7}>
+          <Text style={[styles.likeHeart, isLiked && styles.likeHeartActive]}>
+            {isLiked ? '♥' : '♡'}
+          </Text>
+          <Text style={[styles.likeCount, isLiked && styles.likeCountActive]}>
+            {post.likes_count}
+          </Text>
+        </TouchableOpacity>
       </View>
     </Card>
   );
@@ -62,7 +81,7 @@ function PostCard({ post, currentUserId, onDelete }: { post: Post; currentUserId
 
 export default function FeedScreen() {
   const { data: user } = useCurrentUser();
-  const { data: posts, isLoading, refresh, createPost, deletePost } = useFeed();
+  const { data: posts, likedIds, isLoading, refresh, createPost, deletePost, likePost, unlikePost } = useFeed(user?.id);
   const [composing, setComposing] = useState(false);
   const [draft, setDraft] = useState('');
   const [posting, setPosting] = useState(false);
@@ -85,6 +104,14 @@ export default function FeedScreen() {
 
   function handleDelete(postId: string) {
     void deletePost(postId).catch(() => null);
+  }
+
+  function handleLike(postId: string) {
+    if (likedIds.has(postId)) {
+      void unlikePost(postId);
+    } else {
+      void likePost(postId);
+    }
   }
 
   return (
@@ -136,6 +163,8 @@ export default function FeedScreen() {
             <PostCard
               post={item}
               currentUserId={user?.id ?? ''}
+              isLiked={likedIds.has(item.id)}
+              onLike={handleLike}
               onDelete={handleDelete}
             />
           )}
@@ -196,7 +225,11 @@ const styles = StyleSheet.create({
   postContent: { color: Colors.text, marginBottom: Spacing.sm },
   postImage: { width: '100%', height: 200, borderRadius: Radius.md, marginBottom: Spacing.sm },
   postFooter: { flexDirection: 'row', alignItems: 'center' },
-  likes: { fontFamily: Fonts.bodyRegular, fontSize: FontSizes.sm, color: Colors.textSecondary },
+  likeBtn: { flexDirection: 'row', alignItems: 'center', gap: 5, padding: 4 },
+  likeHeart: { fontSize: 16, color: Colors.textSecondary },
+  likeHeartActive: { color: Colors.blush },
+  likeCount: { fontFamily: Fonts.bodyRegular, fontSize: FontSizes.sm, color: Colors.textSecondary },
+  likeCountActive: { color: Colors.blush },
   emptyCard: { alignItems: 'center', paddingVertical: Spacing.xl },
   emptyText: { fontFamily: Fonts.bodyRegular, fontSize: FontSizes.md, color: Colors.textSecondary, textAlign: 'center' },
   postError: { fontFamily: Fonts.bodyRegular, fontSize: FontSizes.sm, color: Colors.error, marginBottom: Spacing.xs },

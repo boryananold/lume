@@ -15,12 +15,38 @@ import { useLastCheckIn } from '@/hooks/useLastCheckIn';
 import { useStreak } from '@/hooks/useStreak';
 import { useAnnualUpsell } from '@/hooks/useAnnualUpsell';
 
+const AFFIRMATIONS = [
+  'Softness is a kind of strength — I can hold both.',
+  'I tend to myself the way I tend to the things I love.',
+  'My skin reflects the care I give it — and the peace I seek.',
+  'I return to my ritual because I return to myself.',
+  'Rest is not a reward. It is part of the work.',
+  'I am allowed to feel beautiful, exactly as I am today.',
+  'Small consistencies build the life I want.',
+  'Glowing from the inside out starts with showing up.',
+  'I choose nourishment over perfection.',
+  'My ritual is an act of love, not obligation.',
+  'Every day I start again — and that is enough.',
+  'I am not behind. I am exactly where I need to be.',
+  'Caring for my skin is caring for the vessel I live in.',
+  'I honour the rhythm of my body and its needs.',
+  'Presence is the most luxurious thing I can give myself.',
+];
+
+function getDailyAffirmation(): string {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), 0, 0);
+  const dayOfYear = Math.floor((now.getTime() - start.getTime()) / 86_400_000);
+  return AFFIRMATIONS[dayOfYear % AFFIRMATIONS.length] ?? AFFIRMATIONS[0]!;
+}
+
 // Acceptance criteria: __tests__/acceptance/today.test.ts
 // - Shows time-based greeting
 // - "Begin today's check-in" routes to /check-in
 // - Shows current Glow Score + streak summary if available
 
 export default function TodayScreen() {
+  const dailyAffirmation = getDailyAffirmation();
   const greeting = greetingForHour(new Date().getHours());
   const { data: user } = useCurrentUser();
   const { data: profile } = useProfile(user?.id ?? '');
@@ -146,9 +172,7 @@ export default function TodayScreen() {
 
       <Card style={styles.hintCard}>
         <Text style={styles.hintLabel}>Today's intention</Text>
-        <Text style={styles.hintText}>
-          "Softness is a kind of strength — I can hold both."
-        </Text>
+        <Text style={styles.hintText}>"{dailyAffirmation}"</Text>
       </Card>
     </ScreenContainer>
   );

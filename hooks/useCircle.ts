@@ -55,7 +55,7 @@ export function useCircle(userId: string) {
         .select('*', { count: 'exact', head: true })
         .eq('circle_id', circle.id);
 
-      setState({ data: circle, memberCount: (count ?? 0) + 1, isLoading: false, error: null });
+      setState({ data: circle, memberCount: count ?? 0, isLoading: false, error: null });
     } catch (err) {
       setState({ data: null, memberCount: 0, isLoading: false, error: err instanceof Error ? err : new Error(String(err)) });
     }
@@ -70,8 +70,11 @@ export function useCircle(userId: string) {
       .select()
       .single();
     if (error) throw new Error(error.message);
+    const circle = data as CircleRow;
+    // Add creator as first member
+    await supabase.from('circle_members').insert({ circle_id: circle.id, user_id: userId });
     await load();
-    return data as CircleRow;
+    return circle;
   }, [userId, load]);
 
   const joinCircle = useCallback(async (inviteCode: string) => {
