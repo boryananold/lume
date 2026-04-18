@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import Purchases, { type CustomerInfo } from 'react-native-purchases';
-import { getActiveSubscriptionTier } from '@/lib/revenuecat';
+import { type CustomerInfo } from 'react-native-purchases';
+import { getActiveSubscriptionTier, getCustomerInfo, addCustomerInfoUpdateListener } from '@/lib/revenuecat';
 import type { SubscriptionTier } from '@/types/api';
 
 interface SubscriptionState {
@@ -21,7 +21,7 @@ export function useSubscription() {
 
     async function load() {
       try {
-        const customerInfo = await Purchases.getCustomerInfo();
+        const customerInfo = await getCustomerInfo();
         const tier = getActiveSubscriptionTier(customerInfo);
         if (!cancelled) setState({ data: { tier, customerInfo }, isLoading: false, error: null });
       } catch (err) {
@@ -34,7 +34,7 @@ export function useSubscription() {
     void load();
 
     try {
-      Purchases.addCustomerInfoUpdateListener((customerInfo) => {
+      addCustomerInfoUpdateListener((customerInfo) => {
         if (cancelled) return;
         const tier = getActiveSubscriptionTier(customerInfo);
         setState({ data: { tier, customerInfo }, isLoading: false, error: null });

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { Colors, Fonts, FontSizes, Radius, Spacing, TextStyles } from '@/constants/theme';
 import { signInWithEmail, signUpWithEmail, supabase } from '@/lib/supabase';
 import { identifyUser } from '@/lib/braze';
+import { initRevenueCat } from '@/lib/revenuecat';
 
 // Acceptance criteria: __tests__/acceptance/login.test.ts
 // - Email + password fields visible
@@ -59,6 +60,7 @@ export default function LoginScreen() {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
         identifyUser({ userId: session.user.id, email: session.user.email ?? '', subscriptionTier: 'free' });
+        initRevenueCat(session.user.id);
         await applyPendingOnboardingDraft(session.user.id, session.user.email ?? '');
       }
       router.replace('/(tabs)');

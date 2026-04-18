@@ -30,3 +30,11 @@ export function getActiveSubscriptionTier(customerInfo: CustomerInfo): Subscript
   if (customerInfo.entitlements.active[ENTITLEMENT_GLOW_PLUS]) return 'glow_plus';
   return 'free';
 }
+
+export async function getCustomerInfo(): Promise<CustomerInfo> {
+  return Purchases.getCustomerInfo();
+}
+
+export function addCustomerInfoUpdateListener(listener: (info: CustomerInfo) => void): void {
+  Purchases.addCustomerInfoUpdateListener(listener);
+}

@@ -49,6 +49,21 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "owner": "georgi.shulev",
+    "extra": {
+      "OPENAI_API_KEY": "",
+      "SUPABASE_URL": "",
+      "SUPABASE_ANON_KEY": "",
+      "REVENUECAT_API_KEY": "",
+      "BRAZE_API_KEY": "",
+      "BRAZE_ENDPOINT": "",
+      "MIXPANEL_TOKEN": "",
+      "ROBOFLOW_API_KEY": "",
+      "router": {},
+      "eas": {
+        "projectId": "0fcb839b-94d8-458f-acde-a2efd0d257f8"
+      }
     }
   }
 }

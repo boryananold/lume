@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getActiveSubscriptionTier } from '@/lib/revenuecat';
-import Purchases from 'react-native-purchases';
+import { getActiveSubscriptionTier, getCustomerInfo } from '@/lib/revenuecat';
 
 export function useAnnualUpsell() {
   const [shouldShow, setShouldShow] = useState(false);
@@ -8,7 +7,7 @@ export function useAnnualUpsell() {
   useEffect(() => {
     async function check() {
       try {
-        const customerInfo = await Purchases.getCustomerInfo();
+        const customerInfo = await getCustomerInfo();
         const tier = getActiveSubscriptionTier(customerInfo);
         if (tier === 'free') return;
 

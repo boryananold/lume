@@ -1,0 +1,34 @@
+diff --git a/node_modules/react-native-reanimated/Common/cpp/reanimated/Fabric/ReanimatedMountHook.cpp b/node_modules/react-native-reanimated/Common/cpp/reanimated/Fabric/ReanimatedMountHook.cpp
+index fc5050c..ca698b9 100644
+--- a/node_modules/react-native-reanimated/Common/cpp/reanimated/Fabric/ReanimatedMountHook.cpp
++++ b/node_modules/react-native-reanimated/Common/cpp/reanimated/Fabric/ReanimatedMountHook.cpp
+@@ -18,7 +18,7 @@ ReanimatedMountHook::~ReanimatedMountHook() noexcept {
+ 
+ void ReanimatedMountHook::shadowTreeDidMount(
+     RootShadowNode::Shared const &rootShadowNode,
+-    double) noexcept {
++    facebook::react::HighResTimeStamp) noexcept {
+   auto reaShadowNode =
+       std::reinterpret_pointer_cast<ReanimatedCommitShadowNode>(
+           std::const_pointer_cast<RootShadowNode>(rootShadowNode));
+diff --git a/node_modules/react-native-reanimated/Common/cpp/reanimated/Fabric/ReanimatedMountHook.h b/node_modules/react-native-reanimated/Common/cpp/reanimated/Fabric/ReanimatedMountHook.h
+index 143eb87..6a10ffd 100644
+--- a/node_modules/react-native-reanimated/Common/cpp/reanimated/Fabric/ReanimatedMountHook.h
++++ b/node_modules/react-native-reanimated/Common/cpp/reanimated/Fabric/ReanimatedMountHook.h
+@@ -5,6 +5,7 @@
+ #include <reanimated/Fabric/ShadowTreeCloner.h>
+ 
+ #include <react/renderer/uimanager/UIManagerMountHook.h>
++#include <react/timing/primitives.h>
+ 
+ #include <memory>
+ 
+@@ -21,7 +22,7 @@ class ReanimatedMountHook : public UIManagerMountHook {
+ 
+   void shadowTreeDidMount(
+       RootShadowNode::Shared const &rootShadowNode,
+-      double mountTime) noexcept override;
++      facebook::react::HighResTimeStamp mountTime) noexcept override;
+ 
+  private:
+   const std::shared_ptr<PropsRegistry> propsRegistry_;
